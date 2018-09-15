@@ -1,4 +1,5 @@
 import os
+# from household_API.groceries.views import IsAuthenticated
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -12,7 +13,7 @@ SECRET_KEY = '9i!gn!b=j$s4(+1&w$v7+@*6^qof8-n!07#!g+f=41%h4bjb3#'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
+CORS_ORIGIN_ALLOW_ALL = DEBUG
 ALLOWED_HOSTS = []
 
 
@@ -20,6 +21,8 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
     'groceries.apps.GroceriesConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -30,6 +33,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -41,6 +45,17 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'household_API.urls'
 
+REST_FRAMEWORK = {
+    # 'DEFAULT_PERMISSION_CLASSES': (
+    #     'household_API.groceries.views.AllowOptionsAuthentication',
+    # ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
+}
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -48,9 +63,9 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.contrib.auth.context_processors.auth',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
         },
