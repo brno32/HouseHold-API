@@ -22,6 +22,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
+    'djoser',
     'corsheaders',
     'groceries.apps.GroceriesConfig',
     'django.contrib.admin',
