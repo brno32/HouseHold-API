@@ -6,15 +6,19 @@ from .serializers import ItemSerializer
 
 
 class ItemList(generics.ListCreateAPIView):
-    queryset = Item.objects.all()
     serializer_class = ItemSerializer
     permission_classes = [AllowOptionsAuthentication]
+
+    def get_queryset(self):
+        return Item.objects.filter(group=self.request.user.groups.first().id)
 
 
 class ItemDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Item.objects.all()
     serializer_class = ItemSerializer
     permission_classes = [AllowOptionsAuthentication]
+
+    def get_queryset(self):
+        return Item.objects.filter(group=self.request.user.groups.first().id)
 
 
 class CreateGroupView():
