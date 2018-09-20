@@ -47,13 +47,14 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'household_API.urls'
 
 REST_FRAMEWORK = {
+    # TODO: get this to work, you imbecile
     # 'DEFAULT_PERMISSION_CLASSES': (
     #     'household_API.groceries.views.AllowOptionsAuthentication',
     # ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     ),
 }
 

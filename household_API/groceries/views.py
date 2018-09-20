@@ -11,8 +11,6 @@ class ItemList(generics.ListCreateAPIView):
 
     def get_queryset(self):
         try:
-            print(self.request.user)
-            print(self.request.user.groups.all())
             qs = Item.objects.filter(group=self.request.user.groups.first().id)
         except AttributeError:
             qs = list()
