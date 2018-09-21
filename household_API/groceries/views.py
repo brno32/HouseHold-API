@@ -1,3 +1,4 @@
+from django.contrib.auth.models import Group
 from rest_framework import generics
 
 from .models import Item
@@ -22,9 +23,20 @@ class ItemDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [AllowOptionsAuthentication]
 
     def get_queryset(self):
-        return Item.objects.filter(group=self.request.user.groups.first().id)
+        try:
+            qs = Item.objects.filter(group=self.request.user.groups.first().id)
+        except AttributeError:
+            qs = list()
+        return qs
 
 
 class GroupList(generics.ListCreateAPIView):
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
+    permission_classes = [AllowOptionsAuthentication]
+
+
+class GroupDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Group.objects.all()
     serializer_class = GroupSerializer
     permission_classes = [AllowOptionsAuthentication]
