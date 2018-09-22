@@ -5,5 +5,5 @@ urlpatterns = [
     path('', ItemList.as_view()),
     path('<int:pk>/', ItemDetail.as_view()),
     path('groups/', GroupList.as_view()),
-    path('groups/<int:pk>/', GroupDetail.as_view()),
+    path('groups/<str:name>/', GroupDetail.as_view()),
 ]

@@ -1,4 +1,5 @@
 from django.contrib.auth.models import Group
+from django.http import Http404
 from rest_framework import generics
 from rest_framework import status
 from rest_framework.response import Response
@@ -53,3 +54,15 @@ class GroupDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
     permission_classes = [AllowOptionsAuthentication]
+
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        try:
+            # Grabs the 'name' parameter from the URL
+            obj = queryset.get(name=self.kwargs['name'])
+        except Group.DoesNotExist:
+            raise Http404
+
+        self.check_object_permissions(self.request, obj)
+        return obj
