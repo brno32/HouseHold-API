@@ -7,6 +7,8 @@ from django.db.models import (
     Model,
 )
 
+Group.add_to_class('password', CharField(max_length=180, default='password'))
+
 
 class Item(Model):
 

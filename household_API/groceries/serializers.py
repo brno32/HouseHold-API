@@ -18,7 +18,7 @@ class UserRegistrationSerializer(BaseUserRegistrationSerializer):
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
-        fields = ('id', 'name')
+        fields = ('id', 'name', 'password')
 
 
 class UserSerializer(serializers.ModelSerializer):
