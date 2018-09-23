@@ -61,9 +61,13 @@ class GroupDetail(generics.RetrieveUpdateDestroyAPIView):
         try:
             # Grabs the 'name' parameter from the URL
             obj = queryset.get(name=self.kwargs['name'])
-            obj.user_set.add(self.request.user)
         except Group.DoesNotExist:
             raise Http404
+
+        if (obj.password != self.request.data['password']):
+            raise Http404
+
+        obj.user_set.add(self.request.user)
 
         self.check_object_permissions(self.request, obj)
         return obj
