@@ -1,3 +1,4 @@
+from django.contrib.auth.hashers import check_password, make_password
 from django.contrib.auth.models import Group
 from django.http import Http404
 from rest_framework import generics
@@ -25,7 +26,7 @@ class ItemList(generics.ListCreateAPIView):
         data = request.data
         # Add the id of the user's group to the data before saving to db
         data['group'] = request.user.groups.first().id
-        serializer = self.get_serializer(data=request.data)
+        serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
@@ -49,6 +50,15 @@ class GroupList(generics.ListCreateAPIView):
     serializer_class = GroupSerializer
     permission_classes = [AllowOptionsAuthentication]
 
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        data['password'] = make_password(data['password'])
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
 
 class GroupDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Group.objects.all()
@@ -64,7 +74,7 @@ class GroupDetail(generics.RetrieveUpdateDestroyAPIView):
         except Group.DoesNotExist:
             raise Http404
 
-        if (obj.password != self.request.data['password']):
+        if not check_password(str(self.request.data['password']), str(obj.password)):
             raise Http404
 
         obj.user_set.add(self.request.user)
