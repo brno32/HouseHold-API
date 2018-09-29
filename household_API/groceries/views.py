@@ -51,11 +51,16 @@ class GroupList(generics.ListCreateAPIView):
     permission_classes = [AllowOptionsAuthentication]
 
     def create(self, request, *args, **kwargs):
-        data = request.data
-        data['password'] = make_password(data['password'])
+        data = dict()
+        data['name'] = request.data['name']
+        data['password'] = make_password(request.data['password'])
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
+
+        group = Group.objects.get(name=data['name'])
+        group.user_set.add(request.user)
+
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
@@ -70,14 +75,14 @@ class GroupDetail(generics.RetrieveUpdateDestroyAPIView):
 
         try:
             # Grabs the 'name' parameter from the URL
-            obj = queryset.get(name=self.kwargs['name'])
+            group = queryset.get(name=self.kwargs['name'])
         except Group.DoesNotExist:
             raise Http404
 
-        if not check_password(str(self.request.data['password']), str(obj.password)):
+        if not check_password(self.request.data['password'], group.password):
             raise Http404
 
-        obj.user_set.add(self.request.user)
+        group.user_set.add(self.request.user)
 
-        self.check_object_permissions(self.request, obj)
-        return obj
+        self.check_object_permissions(self.request, group)
+        return group
