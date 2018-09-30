@@ -78,11 +78,33 @@ class GroupDetail(generics.RetrieveUpdateDestroyAPIView):
             group = queryset.get(name=self.kwargs['name'])
         except Group.DoesNotExist:
             raise Http404
-
         if not check_password(self.request.data['password'], group.password):
             raise Http404
 
-        group.user_set.add(self.request.user)
-
         self.check_object_permissions(self.request, group)
         return group
+
+    def update(self, request, *args, **kwargs):
+        group = self.get_object()
+
+        queryset = self.filter_queryset(self.get_queryset())
+
+        if not check_password(request.data['password'], group.password):
+            raise Http404
+
+        data = {
+            'name': request.data['name'],
+            'password': group.password,
+        }
+
+        serializer = self.get_serializer(group, data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        group.user_set.add(self.request.user)
+
+        if getattr(group, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            group._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
